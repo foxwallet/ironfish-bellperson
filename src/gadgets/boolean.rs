@@ -297,36 +297,34 @@ pub fn u64_into_boolean_vec_le<Scalar: PrimeField, CS: ConstraintSystem<Scalar>>
     Ok(bits)
 }
 
-pub fn field_into_boolean_vec_le<Scalar, CS>(
-    cs: CS,
-    value: Option<Scalar>,
-) -> Result<Vec<Boolean>, SynthesisError>
-where
+pub fn field_into_boolean_vec_le<
     Scalar: PrimeField,
-    Scalar: PrimeFieldBits,
     CS: ConstraintSystem<Scalar>,
-{
-    let v = field_into_allocated_bits_le::<Scalar, CS>(cs, value)?;
+    F: PrimeFieldBits,
+>(
+    cs: CS,
+    value: Option<F>,
+) -> Result<Vec<Boolean>, SynthesisError> {
+    let v = field_into_allocated_bits_le::<Scalar, CS, F>(cs, value)?;
 
     Ok(v.into_iter().map(Boolean::from).collect())
 }
 
-pub fn field_into_allocated_bits_le<Scalar, CS>(
-    mut cs: CS,
-    value: Option<Scalar>,
-) -> Result<Vec<AllocatedBit>, SynthesisError>
-where
+pub fn field_into_allocated_bits_le<
     Scalar: PrimeField,
-    Scalar: PrimeFieldBits,
     CS: ConstraintSystem<Scalar>,
-{
+    F: PrimeFieldBits
+>(
+    mut cs: CS,
+    value: Option<F>,
+) -> Result<Vec<AllocatedBit>, SynthesisError> {
     // Deconstruct in big-endian bit order
     let values = match value {
         Some(ref value) => {
-            let field_char = Scalar::char_le_bits();
+            let field_char = F::char_le_bits();
             let mut field_char = field_char.into_iter().rev();
 
-            let mut tmp = Vec::with_capacity(Scalar::NUM_BITS as usize);
+            let mut tmp = Vec::with_capacity(F::NUM_BITS as usize);
 
             let mut found_one = false;
             for b in value.to_le_bits().into_iter().rev() {
@@ -339,11 +337,11 @@ where
                 tmp.push(Some(b));
             }
 
-            assert_eq!(tmp.len(), Scalar::NUM_BITS as usize);
+            assert_eq!(tmp.len(), F::NUM_BITS as usize);
 
             tmp
         }
-        None => vec![None; Scalar::NUM_BITS as usize],
+        None => vec![None; F::NUM_BITS as usize],
     };
 
     // Allocate in little-endian order
