@@ -1,4 +1,7 @@
 #![allow(clippy::suspicious_arithmetic_impl)]
+#![doc = include_str!("../README.md")]
+//! # bellperson
+//!
 //! `bellperson` is a crate for building zk-SNARK circuits. It provides circuit
 //! traits and and primitive structures, as well as basic gadget implementations
 //! such as booleans and number abstractions.
@@ -15,7 +18,7 @@
 //! - Expose `hash` as a public input using multiscalar packing.
 //!
 //! ```no_run
-//! use bellperson::{
+//! use ironfish_bellperson::{
 //!     gadgets::{
 //!         boolean::{AllocatedBit, Boolean},
 //!         multipack,

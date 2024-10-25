@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-bellperson = { path = "../" }
+ironfish-bellperson = { path = "../" }
 ff = "0.12.0"
 group = "0.12.0"
 structopt = { version = "0.3", default-features = false }
@@ -18,6 +18,6 @@ blstrs = "0.6.0"
 
 [features]
 default = ["groth16"]
-cuda = ["bellperson/cuda", "blstrs/gpu"]
-opencl = ["bellperson/opencl", "blstrs/gpu"]
-groth16 = ["bellperson/groth16"]
+cuda = ["ironfish-bellperson/cuda", "blstrs/gpu"]
+opencl = ["ironfish-bellperson/opencl", "blstrs/gpu"]
+groth16 = ["ironfish-bellperson/groth16"]

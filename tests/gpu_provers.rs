@@ -1,4 +1,4 @@
-use bellperson::{Circuit, ConstraintSystem, SynthesisError};
+use ironfish_bellperson::{Circuit, ConstraintSystem, SynthesisError};
 use ff::PrimeField;
 
 #[derive(Clone)]
@@ -38,7 +38,7 @@ impl<Scalar: PrimeField> Circuit<Scalar> for DummyDemo {
 #[cfg(any(feature = "cuda", feature = "opencl"))]
 #[test]
 pub fn test_parallel_prover() {
-    use bellperson::groth16::{
+    use ironfish_bellperson::groth16::{
         create_random_proof, create_random_proof_in_priority, generate_random_parameters,
         prepare_verifying_key, verify_proof,
     };

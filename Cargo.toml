@@ -2,20 +2,16 @@
 # https://github.com/zkcrypto/group/pull/29 is fixed. Then we won't need the exports of `Fp` and
 # `Fp2` any more.
 [package]
-name = "bellperson"
+name = "ironfish-bellperson"
 authors = [
   "dignifiedquire <me@dignifiedquire.com>",
   "Sean Bowe <ewillbefull@gmail.com>",
 ]
 description = "zk-SNARK library"
-documentation = "https://docs.rs/bellperson"
-homepage = "https://github.com/filecoin-project/bellman"
 license = "MIT/Apache-2.0"
-repository = "https://github.com/filecoin-project/bellman"
-version = "0.24.1"
-readme = "README.md"
+repository = "https://github.com/iron-fish/bellman"
+version = "0.1.0"
 edition = "2021"
-rust-version = "1.57.0"
 
 [dependencies]
 blake2s_simd = "1.0.0"
