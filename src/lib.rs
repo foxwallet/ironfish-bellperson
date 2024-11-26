@@ -171,3 +171,32 @@ pub(crate) fn le_bytes_to_u64s(le_bytes: &[u8]) -> Vec<u64> {
         .map(|chunk| u64::from_le_bytes(chunk.try_into().unwrap()))
         .collect()
 }
+
+mod log {
+    #[cfg(any(feature = "cuda", feature = "opencl"))]
+    macro_rules! trace {
+        ( $( $tt:tt )* ) => {
+            #[cfg(feature = "log")]
+            ::log::trace!($($tt)*)
+        }
+    }
+
+    macro_rules! debug {
+        ( $( $tt:tt )* ) => {
+            #[cfg(feature = "log")]
+            ::log::debug!($($tt)*)
+        }
+    }
+
+    macro_rules! info {
+        ( $( $tt:tt )* ) => {
+            #[cfg(feature = "log")]
+            ::log::info!($($tt)*)
+        }
+    }
+
+    #[cfg(any(feature = "cuda", feature = "opencl"))]
+    pub(crate) use trace;
+    pub(crate) use debug;
+    pub(crate) use info;
+}

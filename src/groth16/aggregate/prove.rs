@@ -4,10 +4,10 @@ use std::ops::{AddAssign, MulAssign};
 use blstrs::Compress;
 use ff::{Field, PrimeField};
 use group::{prime::PrimeCurveAffine, Curve};
-use log::{debug, info};
 use rayon::prelude::*;
 use serde::Serialize;
 
+use crate::log::{debug, info};
 use super::{
     commit,
     commit::{VKey, WKey},

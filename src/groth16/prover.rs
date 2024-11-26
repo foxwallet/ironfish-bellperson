@@ -1,5 +1,6 @@
 use std::ops::{AddAssign, Mul, MulAssign};
 use std::sync::Arc;
+#[cfg(feature = "log")]
 use std::time::Instant;
 
 use ff::{Field, PrimeField};
@@ -13,13 +14,13 @@ use crate::domain::EvaluationDomain;
 use crate::gpu::{GpuName, LockedFftKernel, LockedMultiexpKernel};
 use crate::multiexp::multiexp;
 use crate::{
-    Circuit, ConstraintSystem, Index, LinearCombination, SynthesisError, Variable, BELLMAN_VERSION,
+    Circuit, ConstraintSystem, Index, LinearCombination, SynthesisError, Variable,
 };
 use ec_gpu_gen::multiexp_cpu::{DensityTracker, FullDensity};
 use ec_gpu_gen::threadpool::{Worker, THREAD_POOL};
 #[cfg(any(feature = "cuda", feature = "opencl"))]
-use log::trace;
-use log::{debug, info};
+use crate::log::trace;
+use crate::log::{debug, info};
 
 #[cfg(any(feature = "cuda", feature = "opencl"))]
 use crate::gpu::PriorityLock;
@@ -294,9 +295,10 @@ where
     E::G1Affine: GpuName,
     E::G2Affine: GpuName,
 {
-    info!("Bellperson {} is being used!", BELLMAN_VERSION);
+    #[cfg(feature = "log")]
+    info!("Bellperson {} is being used!", crate::BELLMAN_VERSION);
 
-    let (start, mut provers, input_assignments, aux_assignments) =
+    let (mut provers, input_assignments, aux_assignments) =
         synthesize_circuits_batch(circuits)?;
 
     let worker = Worker::new();
@@ -605,8 +607,7 @@ where
         drop(prio_lock);
     }
 
-    let proof_time = start.elapsed();
-    info!("prover time: {:?}", proof_time);
+    info!("prover time: {:?}", start.elapsed());
 
     Ok(proofs)
 }
@@ -649,7 +650,6 @@ fn synthesize_circuits_batch<Scalar, C>(
     circuits: Vec<C>,
 ) -> Result<
     (
-        Instant,
         std::vec::Vec<ProvingAssignment<Scalar>>,
         std::vec::Vec<std::sync::Arc<std::vec::Vec<<Scalar as PrimeField>::Repr>>>,
         std::vec::Vec<std::sync::Arc<std::vec::Vec<<Scalar as PrimeField>::Repr>>>,
@@ -660,7 +660,9 @@ where
     Scalar: PrimeField,
     C: Circuit<Scalar> + Send,
 {
+    #[cfg(feature = "log")]
     let start = Instant::now();
+
     let mut provers = circuits
         .into_par_iter()
         .map(|circuit| -> Result<_, SynthesisError> {
@@ -681,6 +683,7 @@ where
     info!("synthesis time: {:?}", start.elapsed());
 
     // Start fft/multiexp prover timer
+    #[cfg(feature = "log")]
     let start = Instant::now();
     info!("starting proof timer");
 
@@ -710,7 +713,7 @@ where
         })
         .collect::<Vec<_>>();
 
-    Ok((start, provers, input_assignments, aux_assignments))
+    Ok((provers, input_assignments, aux_assignments))
 }
 
 #[cfg(test)]

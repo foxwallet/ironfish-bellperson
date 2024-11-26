@@ -2,11 +2,11 @@ use blstrs::Compress;
 use crossbeam_channel::bounded;
 use ff::{Field, PrimeField};
 use group::{prime::PrimeCurveAffine, Curve, Group};
-use log::{debug, info};
 use pairing::{Engine, MultiMillerLoop};
 use rayon::prelude::*;
 use serde::Serialize;
 
+use crate::log::{debug, info};
 use super::{
     accumulator::PairingChecks,
     inner_product,
@@ -24,6 +24,7 @@ use crate::SynthesisError;
 
 use std::default::Default;
 use std::ops::{AddAssign, MulAssign, SubAssign};
+#[cfg(feature = "log")]
 use std::time::Instant;
 
 /// Verifies the aggregated proofs thanks to the Groth16 verifying key, the
@@ -89,6 +90,7 @@ where
     // 1.Check TIPA proof ab
     // 2.Check TIPA proof c
     //        s.spawn(move |_| {
+    #[cfg(feature = "log")]
     let now = Instant::now();
     verify_tipp_mipp::<E, R>(
         ip_verifier_srs,
@@ -119,12 +121,12 @@ where
     //
     let (r_vec_sender, r_vec_receiver) = bounded(1);
 
+    #[cfg(feature = "log")]
     let now = Instant::now();
     r_vec_sender
         .send(structured_scalar_power(public_inputs.len(), &*r))
         .unwrap();
-    let elapsed = now.elapsed().as_millis();
-    debug!("generation of r vector: {}ms", elapsed);
+    debug!("generation of r vector: {}ms", now.elapsed().as_millis());
 
     par! {
         // 3. Compute left part of the final pairing equation
@@ -160,6 +162,7 @@ where
 
             let powers = r_vec_receiver.recv().unwrap();
 
+            #[cfg(feature = "log")]
             let now = Instant::now();
             // now we do the multi exponentiation
             let getter = |i: usize| -> <E::Fr as PrimeField>::Repr {
@@ -182,8 +185,7 @@ where
             g_ic.add_assign(&totsi);
 
             let ml = E::multi_miller_loop(&[(&g_ic.to_affine(), &pvk.gamma_g2)]);
-            let elapsed = now.elapsed().as_millis();
-            debug!("table generation: {}ms", elapsed);
+            debug!("table generation: {}ms", now.elapsed().as_millis());
 
             ml
         }
@@ -315,6 +317,7 @@ where
         // 2.Check TIPA proof c
         //        s.spawn(move |_| {
 
+        #[cfg(feature = "log")]
         let now = Instant::now();
         verify_tipp_mipp::<E, R>(
             ip_verifier_srs,
@@ -421,6 +424,7 @@ fn verify_tipp_mipp<E, R>(
     R: rand_core::RngCore + Send,
 {
     info!("verify with srs shift");
+    #[cfg(feature = "log")]
     let now = Instant::now();
     // (T,U), Z for TIPP and MIPP  and all challenges
     let (final_res, final_r, challenges, challenges_inv, extra_challenge) =
@@ -465,6 +469,7 @@ fn verify_tipp_mipp<E, R>(
             .into_challenge(),
     };
 
+    #[cfg(feature = "log")]
     let now = Instant::now();
     par! {
         // check the opening proof for v
@@ -562,6 +567,7 @@ where
     let zs_ab = &gipa.z_ab;
     let zs_c = &gipa.z_c;
 
+    #[cfg(feature = "log")]
     let now = Instant::now();
 
     let mut challenges = Vec::new();
@@ -643,6 +649,7 @@ where
         now.elapsed().as_millis()
     );
 
+    #[cfg(feature = "log")]
     let now = Instant::now();
     // output of the pair commitment T and U in TIPP -> COM((v,w),A,B)
     let (t_ab, u_ab) = proof.com_ab;
