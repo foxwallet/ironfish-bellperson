@@ -78,10 +78,6 @@ maintenance = { status = "actively-developed" }
 name = "lc"
 harness = false
 
-[workspace]
-members = [
-  "verifier-bench"
-]
 
 [build-dependencies]
 blstrs = { version = "0.6.0", features = ["__private_bench"] }
