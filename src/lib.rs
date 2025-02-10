@@ -138,7 +138,7 @@
 //! using the [`ff`] and [`group`] crates, while specific proving systems will
 //! be separate crates that pull in the dependencies they require.
 
-#![cfg_attr(all(target_arch = "aarch64", nightly), feature(stdsimd))]
+#![cfg_attr(all(target_arch = "aarch64"), allow(unused_features))]
 
 #[cfg(test)]
 #[macro_use]
