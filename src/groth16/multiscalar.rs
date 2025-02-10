@@ -286,8 +286,8 @@ fn prefetch<T>(p: *const T) {
 #[cfg(all(nightly, target_arch = "aarch64"))]
 fn prefetch<T>(p: *const T) {
     unsafe {
-        use std::arch::aarch64::*;
-        _prefetch(p as *const _, _PREFETCH_READ, _PREFETCH_LOCALITY3);
+        // use std::arch::aarch64::*;
+        // _prefetch(p as *const _, _PREFETCH_READ, _PREFETCH_LOCALITY3);
     }
 }
 
